@@ -1,0 +1,24 @@
+BluePill (STM32):
+PB6 - SCL
+PB7 - SDA
+PA7 - Enc. Pin A
+PB0 - Enc. Pin B
+PB1 - Enc. not used
+
+ADS1115:
+VDD - 3.3V
+GND - GND
+SCL - PB6
+SDA - PB7
+A0 - 4 (DB9)
+
+DB9 connector:
+1 - GND
+2 - 3.3V (analog sensor)
+3 - n/c
+4 - A0 (analog sensor)
+5 - 5V (digital sensor)
+6 - PB0 (digital sensor)
+7 - PA7 (digital sensor)
+8 - PB1 (digital sensor)
+9 - n/c
