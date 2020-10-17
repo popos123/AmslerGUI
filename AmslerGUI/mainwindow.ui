@@ -998,7 +998,7 @@
             <rect>
              <x>300</x>
              <y>20</y>
-             <width>81</width>
+             <width>61</width>
              <height>21</height>
             </rect>
            </property>
@@ -1026,6 +1026,25 @@
            </property>
            <property name="checked">
             <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_23">
+           <property name="geometry">
+            <rect>
+             <x>370</x>
+             <y>20</y>
+             <width>121</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Siła tarcia poniżej 0</string>
            </property>
           </widget>
          </widget>
@@ -1334,10 +1353,10 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;Kalibracja:&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;Przed każdym badaniem należy dokonać kalibracji. W zakładce &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt;Konfiguracja&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt; w polu &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt;Ustawienia&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt; należy wybrać zakres oraz częstotliwość próbkowania.&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;Następnie można przystąpić do kalibracji czujnika analogowego:&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;- jeśli po naciśnięciu przycisku &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt;Test&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;, wartość analogowa jest większa niż 100 (wartość na okienku Logi) wystarczy tylko nacisnąć guzik&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt; Kalibruj 0 AN&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;- jeśli po naciśnięciu przycisku &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt;Test&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;, wartość analogowa jest większa niż 100 (wartość na okienku Logi) ale mniejsza niż 200, wystarczy tylko nacisnąć guzik&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt; Kalibruj 0 AN&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;- w przeciwnym wypadku czujnik jest poza zakresem lub np. w połowie zakresu, dlatego należy odkręcić śrubę mocującą go i obserwować na wciśniętym guziku &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt;Test&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt; czy wartości są w przedziale 100-200 wartości analogowej. Następnie przykręcić czujnik i nacisnąć guzik &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt;Kalibruj 0 AN&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;Kalibracja czujnika cyfrowego następuje przed ustawieniem obciążenia na Amslerze w neutralnej pozycji czujnika, po czym kliknąć w guzik&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt; Kalibruj 0 DG&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;Po zamocowaniu próbki, skalibrowaniu czujników i ustawieniu obciążenia należy przejść do zakładki &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt;Pomiar&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt; w której można spersonalizować wykres oraz włączyć zapisywanie do pliku tekstowego.&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;Po zamocowaniu próbki, skalibrowaniu czujników i ustawieniu obciążenia należy przejść do zakładki &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt;Pomiar&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt; w której można spersonalizować wykres oraz włączyć zapisywanie do pliku tekstowego.&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; W pliku tekstowym zapisują się tylko pomiary, aby zapisać informacje o próbce należy wygenerować &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; color:#aa0000;&quot;&gt;raport!&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;Aby rozpocząć pomiar należy nacisnąć guzik &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt;Start pomiar&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;Po zakończeniu pomiaru można wygenerować raport w zakładce &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt; font-weight:600;&quot;&gt;Raport&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt; i zapisać do plik PDF.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2','sans-serif'; font-size:8.5pt;&quot;&gt;Dokładny opis programu oraz tribometru znajduje się w instrukcji.&lt;/span&gt;&lt;/p&gt;
@@ -1353,7 +1372,7 @@ p, li { white-space: pre-wrap; }
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>50</height>
+            <height>45</height>
            </size>
           </property>
           <property name="maximumSize">
@@ -1369,13 +1388,13 @@ p, li { white-space: pre-wrap; }
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>20</y>
+             <y>16</y>
              <width>631</width>
-             <height>16</height>
+             <height>20</height>
             </rect>
            </property>
            <property name="text">
-            <string>Amsler GUI v0.9.9 by Tomasz Desaniuk | 2020 | PŚK | Pliki źródłowe: https://github.com/popos123/AmslerGUI</string>
+            <string>Amsler GUI v1.0.0 by Tomasz Desaniuk | 2020 | PŚK | Pliki źródłowe: https://github.com/popos123/AmslerGUI</string>
            </property>
           </widget>
          </widget>

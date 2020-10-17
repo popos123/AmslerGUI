@@ -18,7 +18,8 @@ int cal_dig = 0;
 int cal_anl = 80;
 float Analog_c = 0.0;
 int Digital_c = 0;
-float gain_c = 10.0;
+float gain_c = 10000.0;
+float max_analog = 32767.0;
 QString file_name = "";
 double last_time = 0;
 double key = 0;
@@ -52,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     on_checkBox_8_toggled(1);
     ui->pushButtonLedOff->setDisabled(true);
     ui->pushButtonLedOff_2->setDisabled(true);
-    // start of disable temp. a temperature graph =================================================
+    // start of disable a force graph =================================================
     ui->centralWidget_2->axisRect()->axis(QCPAxis::atRight, 2)->setVisible(false); // hide axis
     mGraph3->setVisible(false); // hide graph
     mTag1->updatePosition(10000); // move out tag
@@ -60,22 +61,25 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     mTag3->updatePosition(10000); // move out tag
     timerSlot(); // for disable legend
     ui->centralWidget_2->replot();
-    // end of disable temp. a temperature graph ===================================================
+    // end of disable a force graph ===================================================
     // register the plot document object (only needed once, no matter how many plots will be in the QTextDocument):
     QCPDocumentObject *plotObjectHandler = new QCPDocumentObject(this);
     ui->textBrowser->document()->documentLayout()->registerHandler(QCPDocumentObject::PlotTextFormat, plotObjectHandler);
-    QStringList gain = {"10 mm", "6.5 mm", "3.2 mm", "1.58 mm"};
+    // fill and select ranego in combo box
+    QStringList gain = {"10 mm", "6.0 mm", "3.0 mm", "1.5 mm"};
     ui->comboBoxDevices_2->addItems(gain);
     // set default gain
     if (set_default_gain == 0) {
         if(this->device->isOpen()) {
-            this->sendMessageToDevice("(GAIN4)"), rd = 0, gain_c = ((32767.0-(float)cal_anl)*500.0)/10651.0;
+            this->sendMessageToDevice("(GAIN4)");
+            rd = 0, max_analog = 32767.0, gain_c = (((float)max_analog-(float)cal_anl)*500.0)/10651.0;
             ui->comboBoxDevices_2->setCurrentIndex(3);
             set_default_gain = 1;
         }
     }
-    ui->comboBoxDevices_2->setCurrentIndex(3); // nie wiem dlaczego w funkcji wyżej nie działa
     ui->spinBox_4->setDisabled(true);
+    ui->label_23->setStyleSheet("QLabel { color : red; }");
+    ui->label_23->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -135,7 +139,8 @@ void MainWindow::autoConnect()
     }
     if (set_default_gain == 0) {
         if(this->device->isOpen()) {
-            this->sendMessageToDevice("(GAIN4)"), rd = 0, gain_c = ((32767.0-(float)cal_anl)*500.0)/10651.0;
+            this->sendMessageToDevice("(GAIN4)");
+            rd = 0, max_analog = 32767.0, gain_c = (((float)max_analog-(float)cal_anl)*500.0)/10651.0;
             ui->comboBoxDevices_2->setCurrentIndex(3);
             set_default_gain = 1;
         }
@@ -185,7 +190,6 @@ void MainWindow::makePlot()
     ui->centralWidget_2->graph(0)->setName("Zużycie liniowe [µm]");
     ui->centralWidget_2->graph(1)->setName("Współczynnik tarcia");
     ui->centralWidget_2->graph(2)->setName("Siła tarcia [N]");
-    //ui->centralWidget_2->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignLeft|Qt::AlignTop);
     // add legend under graph
     QCPLayoutGrid *subLayout = new QCPLayoutGrid;
     ui->centralWidget_2->plotLayout()->addElement(1, 0, subLayout);
@@ -202,12 +206,9 @@ void MainWindow::makePlot()
 void MainWindow::on_pushButtonSearch_clicked()
 {
     ui->comboBoxDevices->clear();
-
     this->addToLogs("Szukam urządzeń...", "black");
-
     QList<QSerialPortInfo> devices;
     devices = QSerialPortInfo::availablePorts();
-
     for(int i = 0; i < devices.count(); i++)
     {
         this->addToLogs("Znaleziono urządzenie: " + devices.at(i).portName() + " " + devices.at(i).description(), "black");
@@ -234,7 +235,7 @@ void MainWindow::sendMessageToDevice(QString message)
     else
     {
         this->addToLogs("Port nie jest otwarty!", "red");
-        autoConnect(); // do wywalenia???
+        autoConnect(); // just in case
     }
 }
 
@@ -245,14 +246,11 @@ void MainWindow::on_pushButtonConnect_clicked()
         this->addToLogs("Nie wykryto żadnych urządzeń!", "black");
         return;
     }
-
     QString comboBoxQString = ui->comboBoxDevices->currentText();
     QStringList portList = comboBoxQString.split("\t");
     QString portName = portList.first();
-
     this->device->setPortName(portName);
-
-    // OTWÓRZ I SKONFIGURUJ PORT:
+    // open and configure
     if(!device->isOpen())
     {
         if(device->open(QSerialPort::ReadWrite))
@@ -262,11 +260,8 @@ void MainWindow::on_pushButtonConnect_clicked()
             this->device->setParity(QSerialPort::NoParity);
             this->device->setStopBits(QSerialPort::OneStop);
             this->device->setFlowControl(QSerialPort::NoFlowControl);
-
             // CONNECT:
-            connect(this->device, SIGNAL(readyRead()),
-                    this, SLOT(readFromPort()));
-
+            connect(this->device, SIGNAL(readyRead()), this, SLOT(readFromPort()));
             this->addToLogs("Otwarto port szeregowy.", "green");
             ui->label_4->setStyleSheet("QLabel { color : green; }");
             ui->label_4->setText("Połaczono");
@@ -297,9 +292,9 @@ void MainWindow::readFromPort()
             Analog_ = Analog.toInt();
             Digital_ = Digital.toInt();
             // zero calibration
-            Digital_c = Digital_; // mozna dodac abs()
-            //Analog_c = Analog_ - cal_anl; // odczyt analogowy - kalibracja
-            Analog_c = map(Analog_, cal_anl, 32767, 0.0, gain_c); // dodac zmiane zakresu
+            Digital_c = Digital_;
+            //Analog_c = Analog_ - cal_anl; // analog read - calibration
+            Analog_c = map(Analog_, cal_anl, max_analog, 0.0, gain_c);
             //qDebug() << Analog_c;
             //qDebug() << Digital_c;
             rd = 0;
@@ -331,8 +326,8 @@ void MainWindow::on_pushButtonCloseConnection_clicked()
 void MainWindow::on_pushButtonLedOn_clicked() // start
 {
     if(this->device->isOpen()) {
-        mDataTimer.start(interval); // na wszelki wypadek
-        timer2->restart(); // licz czas od nowa
+        mDataTimer.start(interval); // just in case (on calibration first use)
+        timer2->restart();
         ena = 1;
         ui->pushButton_4->setDisabled(true);
         ui->pushButtonLedOn->setDisabled(true);
@@ -346,9 +341,9 @@ void MainWindow::on_pushButtonLedOn_clicked() // start
 void MainWindow::on_pushButtonLedOff_clicked() // pause
 {
     if(this->device->isOpen()) {
-        mDataTimer.stop(); // na wszelki wypadek
-        last_time += timer2->elapsed()/1000.0; // ostatni czas
-        timer2->restart(); // reset licznika czasu
+        mDataTimer.stop();
+        last_time += timer2->elapsed()/1000.0; // last time stamp
+        timer2->restart();
         ena = 0;
         ui->pushButton_4->setDisabled(true);
         ui->pushButtonLedOn->setDisabled(false);
@@ -364,15 +359,15 @@ void MainWindow::on_pushButtonLedOff_2_clicked() // stop
 {
     if(this->device->isOpen()) {
         first_save_file = 0;
-        mDataTimer.stop(); // na wszelki wypadek
-        last_time += timer2->elapsed()/1000.0; // ostatni czas
+        mDataTimer.stop();
+        last_time += timer2->elapsed()/1000.0; // last time stamp
         last_reset = last_time;
         ui->centralWidget_2->graph(0)->data()->removeBefore(last_reset);
         ui->centralWidget_2->graph(1)->data()->removeBefore(last_reset);
         ui->centralWidget_2->graph(2)->data()->removeBefore(last_reset);
         ui->centralWidget_2->xAxis->moveRange(-last_reset);
         ui->centralWidget_2->replot();
-        timer2->restart(); // reset licznika czasu
+        timer2->restart();
         ena = 0;
         ui->pushButton_4->setDisabled(false);
         ui->pushButtonLedOff->setDisabled(true);
@@ -400,12 +395,10 @@ void MainWindow::on_checkBox_8_toggled(bool checked)
 void MainWindow::on_pushButton_clicked()
 {
     ui->textEditLogs->clear();
-    //ui->textEditLogs->setDisabled(false);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-
     int ena_old = 0;
     if(ena == 1) {
         ena = 0;
@@ -414,10 +407,11 @@ void MainWindow::on_pushButton_2_clicked()
     if(this->device->isOpen()) this->sendMessageToDevice("(EE)"), rd = 0;
     else this->addToLogs("Port nie jest otwarty!", "red");
     if(ena_old == 1) ena = 1;
-    else ena_old = 0; // nie trza bo deklaruje od nowa
+    else ena_old = 0; // just in case (is declaring as local)
     if(this->device->isOpen()) ui->label_d->setStyleSheet("QLabel { color : green; }");
     QTimer::singleShot(1000, [this]() { ui->label_d->setStyleSheet("QLabel { color : black; }"); } );
     on_pushButton_6_toggled(1);
+    on_pushButton_6_toggled(0);
 }
 
 void MainWindow::on_pushButton_3_clicked()
@@ -430,10 +424,11 @@ void MainWindow::on_pushButton_3_clicked()
     cal_anl = 0;
     cal_anl = Analog_;
     if(ena_old == 1) ena = 1;
-    else ena_old = 0; // nie trza bo deklaruje od nowa
+    else ena_old = 0; // just in case (is declaring as local)
     if(this->device->isOpen()) ui->label_a->setStyleSheet("QLabel { color : green; }");
     QTimer::singleShot(1000, [this]() { ui->label_a->setStyleSheet("QLabel { color : black; }"); } );
     on_pushButton_6_toggled(1);
+    on_pushButton_6_toggled(0);
 }
 
 void MainWindow::on_pushButton_4_clicked()
@@ -492,7 +487,7 @@ void MainWindow::on_checkBox_2_toggled(bool checked) // Digital chart
     ui->centralWidget_2->replot();
 }
 
-void MainWindow::on_checkBox_3_toggled(bool checked) // Temp. chart
+void MainWindow::on_checkBox_3_toggled(bool checked) // force chart
 {
     if (checked == 0) {
         ui->centralWidget_2->axisRect()->axis(QCPAxis::atRight, 2)->setVisible(false); // hide axis
@@ -539,7 +534,7 @@ void MainWindow::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *ite
   {
     QCPPlottableLegendItem *plItem = qobject_cast<QCPPlottableLegendItem*>(item);
     bool ok;
-    QString newName = QInputDialog::getText(this, "QCustomPlot example", "New graph name:", QLineEdit::Normal, plItem->plottable()->name(), &ok);
+    QString newName = QInputDialog::getText(this, "Zmień nazwę", "Nowa nazwa:", QLineEdit::Normal, plItem->plottable()->name(), &ok);
     if (ok)
     {
       plItem->plottable()->setName(newName);
@@ -552,7 +547,8 @@ void MainWindow::timerSlot()
 {
     if (set_default_gain == 0) {
         if(this->device->isOpen()) {
-            this->sendMessageToDevice("(GAIN4)"), rd = 0, gain_c = ((32767.0-(float)cal_anl)*500.0)/10651.0;
+            this->sendMessageToDevice("(GAIN4)");
+            rd = 0, max_analog = 32767.0, gain_c = (((float)max_analog-(float)cal_anl)*500.0)/10651.0;
             ui->comboBoxDevices_2->setCurrentIndex(3);
             set_default_gain = 1;
         }
@@ -581,7 +577,11 @@ void MainWindow::timerSlot()
         key = last_time + (timer2->elapsed()/1000.0); // time elapsed since start - in seconds
         send_cnt++;
         //calc Friction Force [N]
-        force = ((double)Digital_c/100.0);
+        if (Digital_c >= 0) force = ((double)Digital_c/100.0), ui->label_23->setVisible(false);
+        else {
+            force = 0;
+            ui->label_23->setVisible(true);
+        }
         // calc range
         if (mass <= 500) force = (10 * (double)force)/(80.0);
         if (mass > 500 && mass < 1000) force = (50 * (double)force)/(80.0);
@@ -622,7 +622,6 @@ void MainWindow::timerSlot()
                 QTextStream stream(&file);
                 if(first_save_file == 1) {
                     first_save_file = 0;
-                    // tu jakieś info dodać o ustawieniach i o próbce
                     stream << "Czas " << "Analog " << "Digital" << "\n";
                 }
                 stream << key-last_reset << " " << Analog_c << " " << u << "\n";
@@ -637,7 +636,6 @@ void MainWindow::timerSlot()
     int m = ( secs % 3600 ) / 60;
     int s = ( secs % 3600 ) % 60;
     QTime t(h, m, s);
-    //qDebug() << t.toString("hh:mm:ss");
     ui->timeEdit_2->setTime(t);
     //display time remaining
     int totalRemainingTime = ((ui->timeEdit->time().hour() * 60.0 * 60.0) + (ui->timeEdit->time().minute() * 60.0) + ui->timeEdit->time().second()) - secs;
@@ -667,8 +665,7 @@ void MainWindow::timerSlot()
     //compare time seted and elapsed
     if (t.hour() == ui->timeEdit->time().hour() && t.minute() == ui->timeEdit->time().minute() && t.second() >= ui->timeEdit->time().second()) {
         if (ena == 1) on_pushButtonLedOff_clicked();
-        // raport
-        // automatic enter to pdf ...
+        // raport time :)
     }
 }
 
@@ -702,7 +699,7 @@ void MainWindow::on_spinBox_2_valueChanged(int arg1)
     mDataTimer.start(interval);
 }
 
-void MainWindow::on_pushButton_5_clicked() // generuj PDF
+void MainWindow::on_pushButton_5_clicked() // generate PDF
 {
     ui->textBrowser->clear();
     mTag1->updatePosition(10000); // move out tag
@@ -710,8 +707,8 @@ void MainWindow::on_pushButton_5_clicked() // generuj PDF
     mTag3->updatePosition(10000); // move out tag
     ui->centralWidget_2->replot();
     QTextCursor cursor = ui->textBrowser->textCursor();
-    double width = 600; //ui->cbUseCurrentSize->isChecked() ? 0 : ui->sbWidth->value();
-    double height = 300; //ui->cbUseCurrentSize->isChecked() ? 0 : ui->sbHeight->value();
+    double width = 600;
+    double height = 300;
     cursor.insertText(QString(QChar::ObjectReplacementCharacter), QCPDocumentObject::generatePlotFormat(ui->centralWidget_2, width, height));
     QString currentDateTime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss");
     cursor.insertText(QString('\n') + QString('\n') + "Data utworzenia raportu: " + currentDateTime + cursor.EndOfLine);
@@ -730,7 +727,7 @@ void MainWindow::on_pushButton_5_clicked() // generuj PDF
 
 void MainWindow::on_pushButton_7_clicked() // zapisz PDF
 {
-    QString fileName = QFileDialog::getSaveFileName(this, "Save document...", qApp->applicationDirPath(), "*.pdf");
+    QString fileName = QFileDialog::getSaveFileName(this, "Zapisz plik jako", qApp->applicationDirPath(), "*.pdf");
     if (!fileName.isEmpty())
     {
       QPrinter printer;
@@ -762,19 +759,31 @@ void MainWindow::on_comboBoxDevices_2_activated(int index)
     //measured_distance_gain_1 - zmierzona odległość
     //measured_ADC_val_gain_1 - otrzymana warotść
     if (index == 0) {
-        if(this->device->isOpen()) this->sendMessageToDevice("(GAIN1)"), rd = 0, gain_c = 10000.0; //
+        if(this->device->isOpen()) {
+            this->sendMessageToDevice("(GAIN1)");
+            rd = 0, max_analog = 26214.0, gain_c = 10000.0; // not calibrated, is rounded up.
+        }
         else this->addToLogs("Port nie jest otwarty!", "red");
     }
     if (index == 1) {
-        if(this->device->isOpen()) this->sendMessageToDevice("(GAIN2)"), rd = 0, gain_c = (((32767.0-(float)cal_anl)*500.0)/10651.0)*4.0; // 6500
+        if(this->device->isOpen()) {
+            this->sendMessageToDevice("(GAIN2)");
+            rd = 0, max_analog = 32767.0, gain_c = (((32767.0-(float)cal_anl)*500.0)/10651.0)*4.0; // 6138
+        }
         else this->addToLogs("Port nie jest otwarty!", "red");
     }
     if (index == 2) {
-        if(this->device->isOpen()) this->sendMessageToDevice("(GAIN3)"), rd = 0, gain_c = (((32767.0-(float)cal_anl)*500.0)/10651.0)*2.0; // 3200
+        if(this->device->isOpen()) {
+            this->sendMessageToDevice("(GAIN3)");
+            rd = 0, max_analog = 32767.0, gain_c = (((32767.0-(float)cal_anl)*500.0)/10651.0)*2.0; // 3069
+        }
         else this->addToLogs("Port nie jest otwarty!", "red");
     }
     if (index == 3) {
-        if(this->device->isOpen()) this->sendMessageToDevice("(GAIN4)"), rd = 0, gain_c = ((32767.0-(float)cal_anl)*500.0)/10651.0;
+        if(this->device->isOpen()) {
+            this->sendMessageToDevice("(GAIN4)");
+            rd = 0, max_analog = 32767.0, gain_c = ((32767.0-(float)cal_anl)*500.0)/10651.0; // 1534
+        }
         else this->addToLogs("Port nie jest otwarty!", "red");
     }
 }
