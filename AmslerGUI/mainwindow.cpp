@@ -10,7 +10,7 @@
 #include <QMessageBox>
 
 int ena = 0;
-int interval = 50;
+int interval = 100;
 int old_interval = 0;
 int Analog_ = 0;
 int Digital_ = 0;
@@ -37,6 +37,7 @@ bool rec = 0;
 double force = 0, mass = 1, u = 0;
 double last_reset = 0;
 bool set_default_gain = 0;
+bool checked_test = 0;
 
 float map(float x, float in_min, float in_max, float out_min, float out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -77,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
             set_default_gain = 1;
         }
     }
+    ui->comboBoxDevices_2->setCurrentIndex(3); // make shure that is set to 1.5 mm (it force showing)
     ui->spinBox_4->setDisabled(true);
     ui->label_23->setStyleSheet("QLabel { color : red; }");
     ui->label_23->setVisible(false);
@@ -294,7 +296,7 @@ void MainWindow::readFromPort()
             // zero calibration
             Digital_c = Digital_;
             //Analog_c = Analog_ - cal_anl; // analog read - calibration
-            Analog_c = map(Analog_, cal_anl, max_analog, 0.0, gain_c);
+            Analog_c = -(map(Analog_, cal_anl, max_analog, 0.0, gain_c)); // inverted results
             //qDebug() << Analog_c;
             //qDebug() << Digital_c;
             rd = 0;
@@ -397,7 +399,7 @@ void MainWindow::on_pushButton_clicked()
     ui->textEditLogs->clear();
 }
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_pushButton_2_clicked() // cal digital button
 {
     int ena_old = 0;
     if(ena == 1) {
@@ -410,11 +412,13 @@ void MainWindow::on_pushButton_2_clicked()
     else ena_old = 0; // just in case (is declaring as local)
     if(this->device->isOpen()) ui->label_d->setStyleSheet("QLabel { color : green; }");
     QTimer::singleShot(1000, [this]() { ui->label_d->setStyleSheet("QLabel { color : black; }"); } );
-    on_pushButton_6_toggled(1);
-    on_pushButton_6_toggled(0);
+    if (checked_test == 0) {
+        on_pushButton_6_toggled(1);
+        on_pushButton_6_toggled(0);
+    }
 }
 
-void MainWindow::on_pushButton_3_clicked()
+void MainWindow::on_pushButton_3_clicked() // cal analog button
 {
     int ena_old = 0;
     if(ena == 1) {
@@ -427,8 +431,10 @@ void MainWindow::on_pushButton_3_clicked()
     else ena_old = 0; // just in case (is declaring as local)
     if(this->device->isOpen()) ui->label_a->setStyleSheet("QLabel { color : green; }");
     QTimer::singleShot(1000, [this]() { ui->label_a->setStyleSheet("QLabel { color : black; }"); } );
-    on_pushButton_6_toggled(1);
-    on_pushButton_6_toggled(0);
+    if (checked_test == 0) {
+        on_pushButton_6_toggled(1);
+        on_pushButton_6_toggled(0);
+    }
 }
 
 void MainWindow::on_pushButton_4_clicked()
@@ -870,13 +876,14 @@ void MainWindow::on_checkBox_7_toggled(bool checked)
     ui->centralWidget_2->replot();
 }
 
-void MainWindow::on_pushButton_6_toggled(bool checked)
+void MainWindow::on_pushButton_6_toggled(bool checked) // test button
 {
     if (checked) {
+        checked_test = 1;
         old_ena = ena;
         ena = 1;
         timerSlot();
         if (!mDataTimer.isActive()) mDataTimer.start(interval);
     }
-    else ena = old_ena;
+    else ena = old_ena, checked_test = 0;
 }
