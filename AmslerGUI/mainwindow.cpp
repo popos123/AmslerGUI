@@ -122,6 +122,7 @@ void MainWindow::autoConnect()
                 ui->label_4->setStyleSheet("QLabel { color : green; }");
                 ui->label_4->setWordWrap(true);
                 ui->label_4->setText("Połączono Automatycznie");
+                set_default_gain = 0;
             }
             else
             {
