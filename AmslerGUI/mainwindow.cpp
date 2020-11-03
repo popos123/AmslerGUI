@@ -67,6 +67,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     // register the plot document object (only needed once, no matter how many plots will be in the QTextDocument):
     QCPDocumentObject *plotObjectHandler = new QCPDocumentObject(this);
     ui->textBrowser->document()->documentLayout()->registerHandler(QCPDocumentObject::PlotTextFormat, plotObjectHandler);
+    // fill and select number of weight
+    QStringList range = {"brak", "1", "2", "3"};
+    ui->comboBoxDevices_3->addItems(range);
     // fill and select ranego in combo box
     QStringList gain = {"10 mm", "6.0 mm", "3.0 mm", "1.5 mm"};
     ui->comboBoxDevices_2->addItems(gain);
@@ -83,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->spinBox_4->setDisabled(true);
     ui->label_23->setStyleSheet("QLabel { color : red; }");
     ui->label_23->setVisible(false);
-    ena = 0;
+    //ena = 0;
 }
 
 MainWindow::~MainWindow()
@@ -602,10 +605,10 @@ void MainWindow::timerSlot()
             ui->label_23->setVisible(true);
         }
         // calc range
-        if (mass <= 500) force = (10 * (double)force)/(80.0);
-        if (mass > 500 && mass < 1000) force = (50 * (double)force)/(80.0);
-        if (mass > 1000 && mass < 1500) force = (100 * (double)force)/(80.0);
-        if (mass > 1500) force = (150 * (double)force)/(80.0);
+        if (ui->comboBoxDevices_3->currentIndex() == 0) force = (10 * (double)force)/(80.0);
+        if (ui->comboBoxDevices_3->currentIndex() == 1) force = (50 * (double)force)/(80.0);
+        if (ui->comboBoxDevices_3->currentIndex() == 2) force = (100 * (double)force)/(80.0);
+        if (ui->comboBoxDevices_3->currentIndex() == 3) force = (150 * (double)force)/(80.0);
         force = (200.0 * (double)force)/((double)r * 2000.0);
         if (mass <= 0) mass = 1; // for no dividing by 0
         u = (double)force / (double)mass;
@@ -674,7 +677,7 @@ void MainWindow::timerSlot()
     if (t.second() % int_check) {
         if (ena_timer == 1) {
             ena_timer = 0;
-            if (percent < 90.0) {
+            if (percent < 90.0 && checked_test == 0) {
                 this->device->close();
                 autoConnect();
             }
