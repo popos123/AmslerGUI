@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     mTag1->updatePosition(10000); // move out tag
     mTag2->updatePosition(10000); // move out tag
     mTag3->updatePosition(10000); // move out tag
+    //ena = 1;
     timerSlot(); // for disable legend
     ui->centralWidget_2->replot();
     // end of disable a force graph ===================================================
@@ -82,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->spinBox_4->setDisabled(true);
     ui->label_23->setStyleSheet("QLabel { color : red; }");
     ui->label_23->setVisible(false);
+    ena = 0;
 }
 
 MainWindow::~MainWindow()
@@ -267,6 +269,15 @@ void MainWindow::on_pushButtonConnect_clicked()
             this->addToLogs("Otwarto port szeregowy.", "green");
             ui->label_4->setStyleSheet("QLabel { color : green; }");
             ui->label_4->setText("Połaczono");
+            // set default gain manually by clicking connect
+            if (set_default_gain == 0) {
+                if(this->device->isOpen()) {
+                    this->sendMessageToDevice("(GAIN4)");
+                    rd = 0, max_analog = 32767.0, gain_c = (((float)max_analog-(float)cal_anl)*500.0)/10651.0;
+                    ui->comboBoxDevices_2->setCurrentIndex(3);
+                    set_default_gain = 1;
+                }
+            }
         }
         else
         {
@@ -317,6 +328,7 @@ void MainWindow::on_pushButtonCloseConnection_clicked()
         ui->label_4->setText("NIE połaczono");
         this->addToLogs("Zamknięto połączenie.", "red");
         ena = 0;
+        set_default_gain = 0;
     }
     else
     {
@@ -628,7 +640,7 @@ void MainWindow::timerSlot()
                 QTextStream stream(&file);
                 if(first_save_file == 1) {
                     first_save_file = 0;
-                    stream << "Czas " << "Analog " << "Digital" << "\n";
+                    stream << "Czas_[s] " << "Zużycie_liniowe_[µm] " << "Współczynnik_tarcia_[µ]" << "\n";
                 }
                 stream << key-last_reset << " " << Analog_c << " " << u << "\n";
                 stream.flush();
