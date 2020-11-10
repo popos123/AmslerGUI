@@ -209,6 +209,7 @@ void MainWindow::makePlot()
     ui->centralWidget_2->plotLayout()->setRowStretchFactor(1, 0.001);
     //after declare - connect timerSlot() to the timer
     connect(&mDataTimer, SIGNAL(timeout()), this, SLOT(timerSlot()));
+    connect(&mDataTimer2, SIGNAL(timeout()), this, SLOT(CopyTimerSlot()));
 }
 
 void MainWindow::on_pushButtonSearch_clicked()
@@ -343,7 +344,7 @@ void MainWindow::on_pushButtonCloseConnection_clicked()
 
 void MainWindow::on_pushButtonLedOn_clicked() // start
 {
-    if(this->device->isOpen()) {
+    if(this->device->isOpen() && checked_test == 0) {
         mDataTimer.start(interval); // just in case (on calibration first use)
         timer2->restart();
         ena = 1;
@@ -567,6 +568,7 @@ void MainWindow::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *ite
 
 void MainWindow::timerSlot()
 {
+    // set gain if not seted
     if (set_default_gain == 0) {
         if(this->device->isOpen()) {
             this->sendMessageToDevice("(GAIN4)");
@@ -575,6 +577,7 @@ void MainWindow::timerSlot()
             set_default_gain = 1;
         }
     }
+    // set new plottable and legend (for rename - legendDoubleClick)
     ui->label_3->setText(QString::number(mDataTimer.remainingTime()) + " ms");
     ui->centralWidget_2->legend->clearItems();
     const int iPlottableCount = ui->centralWidget_2->plottableCount();
@@ -587,6 +590,7 @@ void MainWindow::timerSlot()
                 pPlottable->addToLegend();
         }
     }
+    // main data plot function
     if (ena == 1) {
         // send data request
         this->sendMessageToDevice("(RD)"), rd = 1;
@@ -609,6 +613,7 @@ void MainWindow::timerSlot()
         if (ui->comboBoxDevices_3->currentIndex() == 1) force = (50 * (double)force)/(80.0);
         if (ui->comboBoxDevices_3->currentIndex() == 2) force = (100 * (double)force)/(80.0);
         if (ui->comboBoxDevices_3->currentIndex() == 3) force = (150 * (double)force)/(80.0);
+        // calc final force
         force = (200.0 * (double)force)/((double)r * 2000.0);
         if (mass <= 0) mass = 1; // for no dividing by 0
         u = (double)force / (double)mass;
@@ -719,6 +724,8 @@ void MainWindow::on_spinBox_2_valueChanged(int arg1)
 {
     interval = (1.0/arg1)*1000;
     mDataTimer.start(interval);
+    ui->label_3->setText(QString::number(mDataTimer.remainingTime()) + " ms"); // refresh time interval indicator
+    mDataTimer.stop();
 }
 
 void MainWindow::on_pushButton_5_clicked() // generate PDF
@@ -892,14 +899,41 @@ void MainWindow::on_checkBox_7_toggled(bool checked)
     ui->centralWidget_2->replot();
 }
 
+void MainWindow::CopyTimerSlot()
+{
+    // start of copy from timerSlot() =================================================
+    this->sendMessageToDevice("(RD)"), rd = 1; // send data request
+    // display data in debug menu
+    ui->label_d->setText(QString::number((float)Digital_c/100.0) + "mm");
+    char buf[10];
+    sprintf (buf, "%.2fum", Analog_c);
+    ui->label_a->setText(buf);
+    //calc Friction Force [N]
+    if (Digital_c >= 0) force = ((double)Digital_c/100.0), ui->label_23->setVisible(false);
+    else force = 0, ui->label_23->setVisible(true);
+    // calc range
+    if (ui->comboBoxDevices_3->currentIndex() == 0) force = (10 * (double)force)/(80.0);
+    if (ui->comboBoxDevices_3->currentIndex() == 1) force = (50 * (double)force)/(80.0);
+    if (ui->comboBoxDevices_3->currentIndex() == 2) force = (100 * (double)force)/(80.0);
+    if (ui->comboBoxDevices_3->currentIndex() == 3) force = (150 * (double)force)/(80.0);
+    // calc final force and friction coeff.
+    force = (200.0 * (double)force)/((double)r * 2000.0);
+    if (mass <= 0) mass = 1; // for no dividing by 0
+    u = (double)force / (double)mass;
+    // print foce and friction coefficient on the label
+    ui->label_19->setText(QString::number(force) + " N");
+    ui->label_20->setText(QString::number(u));
+    // end of copy from timerSlot() ====================================================
+}
+
 void MainWindow::on_pushButton_6_toggled(bool checked) // test button
 {
     if (checked) {
         checked_test = 1;
         old_ena = ena;
-        ena = 1;
-        timerSlot();
-        if (!mDataTimer.isActive()) mDataTimer.start(interval);
+        ena = 0;
+        if (!mDataTimer2.isActive()) mDataTimer2.start(interval);
     }
-    else ena = old_ena, checked_test = 0;
+    else ena = old_ena, checked_test = 0, mDataTimer2.stop();
 }
+// dodać custom timer dla zapisywania do pliku

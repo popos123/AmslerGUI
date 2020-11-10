@@ -75,6 +75,7 @@ private slots:
     void on_checkBox_7_toggled(bool checked);
     void on_checkBox_8_toggled(bool checked);
     void on_pushButton_6_toggled(bool checked);
+    void CopyTimerSlot();
 
 private:
     Ui::MainWindow *ui;
@@ -88,6 +89,7 @@ private:
     AxisTag *mTag2;
     AxisTag *mTag3;
     QTimer mDataTimer;
+    QTimer mDataTimer2;
 };
 
 #endif // MAINWINDOW_H
