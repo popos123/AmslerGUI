@@ -101,7 +101,10 @@ void MainWindow::autoConnect()
     QString arduino_portName;
     foreach(const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts()) {
         if (serialPortInfo.hasVendorIdentifier() && serialPortInfo.hasProductIdentifier()) {
-            if ((serialPortInfo.productIdentifier() == 4) && (serialPortInfo.vendorIdentifier() == 7855)) {
+            //this->addToLogs(QString::number(serialPortInfo.productIdentifier()), "black");
+            //this->addToLogs(QString::number(serialPortInfo.vendorIdentifier()), "black");
+            if ((serialPortInfo.productIdentifier() == 4) && (serialPortInfo.vendorIdentifier() == 7855)) { // maple mini bootloader 2.0
+            //if ((serialPortInfo.productIdentifier() == 22336) && (serialPortInfo.vendorIdentifier() == 1155)) { // generic dfu bootloader 2.0
                 arduino_available = true;
                 arduino_portName = serialPortInfo.portName();
             }
