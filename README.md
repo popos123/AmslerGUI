@@ -29,3 +29,4 @@ How to upload the code:
    upload_speed = 115200
    
    upload_port = COM5 
+3. Install the drivers from my repository
