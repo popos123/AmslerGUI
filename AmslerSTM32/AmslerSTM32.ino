@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <EncoderStepCounter.h>
 #include <Adafruit_ADS1015.h>
 #include <Chrono.h>
@@ -25,8 +26,13 @@ EncoderStepCounter encoder(ENCODER_PIN1, ENCODER_PIN2, HALF_STEP);
 Adafruit_ADS1115 ads; // Use this for the 16-bit version
 Chrono mean_t;
 
+void readSerialString();
+void writeSerialData();
+void readData();
+void interrupt();
+
 void setup() {
-  Serial.begin(230400);
+  Serial.begin(500000);
   encoder.begin(); // Initialize encoder
   // Initialize interrupts
   attachInterrupt(ENCODER_INT1, interrupt, CHANGE);
