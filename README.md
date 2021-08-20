@@ -19,4 +19,4 @@ How to upload the code:
    board_build.core = maple
    upload_protocol = dfu
    upload_speed = 115200
-   upload_port = COM5
+   upload_port = COM5 
