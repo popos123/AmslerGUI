@@ -12,6 +12,7 @@ How to upload the code:
 1. upload the bootloader
 2. prefer the platformIO to upload the code via USB with these config:
    [env:genericSTM32F103CB]
+d
    platform = ststm32
    board = genericSTM32F103CB
    framework = arduino
