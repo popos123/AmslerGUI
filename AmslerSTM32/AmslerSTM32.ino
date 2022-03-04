@@ -100,19 +100,19 @@ void writeSerialData() {
     LastCommand[0] = '0';
   }
   if (strcmp(LastCommand, "GAIN1") == 0) {
-    ads.setGain(GAIN_ONE); // 10mm 0-25k 0,05mm (50um)
+    ads.setGain(GAIN_ONE); // 10mm 0-25k 0,005mm (5um)
     ads.begin();
   }
   if (strcmp(LastCommand, "GAIN2") == 0) {
-    ads.setGain(GAIN_TWO); // 6,5mm 0-32k 0,005mm (5um)
+    ads.setGain(GAIN_TWO); // 6,5mm 0-32k 0,002mm (2um)
     ads.begin();
   }
   if (strcmp(LastCommand, "GAIN3") == 0) {
-    ads.setGain(GAIN_FOUR); // 3,2mm 0-32k 0,0005mm (0,5um)
+    ads.setGain(GAIN_FOUR); // 3,2mm 0-32k 0,001mm (1um)
     ads.begin();
   }
   if (strcmp(LastCommand, "GAIN4") == 0) {
-    ads.setGain(GAIN_EIGHT); // 1,58mm 0-32k 0,00005mm (50nm)
+    ads.setGain(GAIN_EIGHT); // 1,58mm 0-32k 0,0005mm (0.5um)
     ads.begin();
   }
   if (LastCommand[0] == 'G' && LastCommand[1] == 'A') {
